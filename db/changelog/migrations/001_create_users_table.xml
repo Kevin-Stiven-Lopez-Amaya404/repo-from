@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <changeSet id="001" author="dev" labels="users,ddl">
+    <comment>Crea la tabla principal de usuarios</comment>
+
+    <createTable tableName="users">
+      <column name="id" type="SERIAL">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="VARCHAR(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="role" type="VARCHAR(20)" defaultValue="user">
+        <constraints nullable="false"/>
+      </column>
+      <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+        <constraints nullable="false"/>
+      </column>
+      <column name="updated_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <!-- Índice para búsquedas por email -->
+    <createIndex indexName="idx_users_email" tableName="users" unique="true">
+      <column name="email"/>
+    </createIndex>
+
+    <!-- Índice para filtrar por rol -->
+    <createIndex indexName="idx_users_role" tableName="users">
+      <column name="role"/>
+    </createIndex>
+
+    <!-- Constraint CHECK para roles válidos -->
+    <sql>
+      ALTER TABLE users
+        ADD CONSTRAINT chk_users_role
+        CHECK (role IN ('user', 'admin'));
+    </sql>
+
+    <rollback>
+      <dropTable tableName="users"/>
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>

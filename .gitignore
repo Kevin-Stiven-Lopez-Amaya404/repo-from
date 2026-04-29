@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+node_modules/
+.env
+*.log
+coverage/
+dist/
+=======
+node_modules
+.env
+>>>>>>> 354f093dfceae62dfc32176cf20fb135d4dcc8ae

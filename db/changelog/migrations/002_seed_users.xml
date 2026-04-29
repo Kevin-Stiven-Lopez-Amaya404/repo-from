@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <changeSet id="002" author="dev" labels="users,seed" context="!test">
+    <comment>Inserta usuarios iniciales del sistema</comment>
+
+    <insert tableName="users">
+      <column name="name"  value="Administrador"/>
+      <column name="email" value="admin@example.com"/>
+      <column name="role"  value="admin"/>
+    </insert>
+
+    <insert tableName="users">
+      <column name="name"  value="Usuario Demo"/>
+      <column name="email" value="demo@example.com"/>
+      <column name="role"  value="user"/>
+    </insert>
+
+    <rollback>
+      <delete tableName="users">
+        <where>email IN ('admin@example.com', 'demo@example.com')</where>
+      </delete>
+    </rollback>
+  </changeSet>
+
+</databaseChangeLog>
