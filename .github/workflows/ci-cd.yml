@@ -1,4 +1,4 @@
-name: CI/CD desde cero
+name: CI/CD seguro
 
 on:
   push:
@@ -9,23 +9,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clonar repositorio
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Instalar Node
-      uses: actions/setup-node@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: '20'
 
+    - name: Ver archivos
+      run: ls -la
+
     - name: Instalar dependencias
-      run: npm install
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        else
+          echo "No es proyecto Node"
+        fi
 
-    - name: Ejecutar pruebas (si existen)
-      run: npm test || echo "No hay tests definidos"
+    - name: Ejecutar tests
+      run: |
+        if grep -q '"test"' package.json; then
+          npm test
+        else
+          echo "No hay tests"
+        fi
 
-    - name: Build del proyecto (si existe)
-      run: npm run build || echo "No hay build definido"
+    - name: Build
+      run: |
+        if grep -q '"build"' package.json; then
+          npm run build
+        else
+          echo "No hay build"
+        fi
 
-    - name: Deploy automático
+    - name: Deploy
       if: success()
-      run: echo "Deploy realizado correctamente 🚀"
+      run: echo "Deploy OK 🚀"
