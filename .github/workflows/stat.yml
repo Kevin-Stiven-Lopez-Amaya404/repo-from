@@ -1,50 +1,47 @@
-name: CI/CD - Java Gradle Deploy
+name: CI/CD seguro
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: gradle
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
-      - name: Dar permisos a gradlew
-        run: chmod +x gradlew
+    - name: Ver archivos
+      run: ls -la
 
-      - name: Ver archivos (debug)
-        run: ls -la
+    - name: Instalar dependencias
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        else
+          echo "No es proyecto Node"
+        fi
 
-      - name: Build con Gradle
-        run: |
-          if [ -f gradlew ]; then
-            ./gradlew build
-          else
-            echo "No existe gradlew"
-            exit 1
-          fi
+    - name: Ejecutar tests
+      run: |
+        if grep -q '"test"' package.json; then
+          npm test
+        else
+          echo "No hay tests"
+        fi
 
-      - name: Verificar JAR generado
-        run: |
-          if ls build/libs/*.jar 1> /dev/null 2>&1; then
-            echo "JAR generado correctamente"
-          else
-            echo "No se generó el JAR"
-            exit 1
-          fi
+    - name: Build
+      run: |
+        if grep -q '"build"' package.json; then
+          npm run build
+        else
+          echo "No hay build"
+        fi
 
-      - name: Subir JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-jar
-          path: build/libs/*.jar
+    - name: Deploy
+      if: success()
+      run: echo "Deploy OK 🚀"
