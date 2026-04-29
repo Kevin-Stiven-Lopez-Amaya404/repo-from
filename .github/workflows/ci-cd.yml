@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Clonar repositorio
+      uses: actions/checkout@v4
+
+    - name: Instalar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Instalar dependencias
+      run: npm install
+
+    - name: Ejecutar pruebas (detectar errores)
+      run: npm test
+
+    - name: Build del proyecto
+      run: npm run build
+
+    - name: Deploy (ejemplo)
+      if: success()
+      run: |
+        echo "Deploy exitoso "
