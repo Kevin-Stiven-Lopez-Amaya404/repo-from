@@ -19,10 +19,31 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Dar permisos a gradlew
+        run: chmod +x gradlew
 
-      - name: Upload JAR
+      - name: Ver archivos (debug)
+        run: ls -la
+
+      - name: Build con Gradle
+        run: |
+          if [ -f gradlew ]; then
+            ./gradlew build
+          else
+            echo "No existe gradlew"
+            exit 1
+          fi
+
+      - name: Verificar JAR generado
+        run: |
+          if ls build/libs/*.jar 1> /dev/null 2>&1; then
+            echo "JAR generado correctamente"
+          else
+            echo "No se generó el JAR"
+            exit 1
+          fi
+
+      - name: Subir JAR
         uses: actions/upload-artifact@v4
         with:
           name: app-jar
